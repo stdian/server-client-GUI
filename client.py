@@ -82,6 +82,45 @@ def sendToTG(window, message):
 	s.sendto(('sendToTG ' + message).encode("utf-8"), server)
 
 
+def sendToClient(window, message, port):
+	message = message.get()
+	port = int(port.get())
+	window.destroy()
+
+	s.sendto(('sendTo ' + str(port) + ' ' + message).encode("utf-8"), server)
+
+
+def sendToClientWindow():
+	sendToClientWindow = Tk()
+
+	sendToClientWindow.title('Client')
+
+	sendToClientWindow.resizable(0, 0)
+
+	label1 = Label(sendToClientWindow, text = 'Input message', fg='black')
+	message = Entry(sendToClientWindow, width = 20)
+
+	label2 = Label(sendToClientWindow, text = 'Input port', fg='black')
+	port = Entry(sendToClientWindow, width = 5)
+	
+	button = Button(sendToClientWindow, text= 'Send', command = lambda : sendToClient(sendToClientWindow, message, port))
+
+	label1.config(font=('Arial', 14, 'bold'))
+	label2.config(font=('Arial', 14, 'bold'))
+	message.config(font=('Arial', 14, 'bold'))
+	port.config(font=('Arial', 14, 'bold'))
+	button.config(font=('Arial', 14, 'bold'))
+
+	label1.grid(column = 0, row = 0)
+	message.grid(column = 1, row = 0, columnspan = 2)
+
+	label2.grid(column = 0, row = 1)
+	port.grid(column = 1, row = 1)
+	button.grid(column = 2, row = 1)
+
+	sendToClientWindow.mainloop()
+
+
 def send(tp):
 	sendWindow = Tk()
 
@@ -166,12 +205,6 @@ def connect_window():
 	servPort_label.grid(column = 0, row = 1)
 	servPort.grid(column = 1, row = 1)
 
-	servIP.delete(0, END)
-	servIP.insert(0, '192.168.0.208')
-
-	servPort.delete(0, END)
-	servPort.insert(0, '8888')
-
 	connectButton.grid(column = 0, columnspan = 2, row = 2)
 
 	connectWindow.mainloop()
@@ -186,6 +219,8 @@ def mainWindow():
 	mainFrame.title('Client')
 
 	mainFrame.resizable(0, 0)
+	info = 'Server: ' + server[0] + ':' + str(server[1]) + '\n' + 'Client: ' + host + ':' + str(client_port)
+	infolabel = Label(mainFrame, text = info, fg='black')
 
 	label1 = Label(mainFrame, text = 'Functions', fg='black')
 	label2 = Label(mainFrame, text = 'Server log', fg='black')
@@ -200,23 +235,33 @@ def mainWindow():
 
 	cmdButton = Button(mainFrame, width = 30, text = 'Execute command', command = lambda: cmd_window())
 
+	screenButton = Button(mainFrame, width = 30, text = 'Send screenshot to VK', command = lambda: s.sendto('screen'.encode("utf-8"), server))
+
+	sendToClientButton = Button(mainFrame, width = 30, text = 'Send message to client', command = lambda: sendToClientWindow())
+	clearButton = Button(mainFrame, width = 30, text = 'Clear server log', command = lambda: T.delete(1.0, END))
+
 	T = Text(mainFrame, height = 40, width = 60)
 
 	label1.config(font=('Arial', 14, 'bold'))
 	label2.config(font=('Arial', 14, 'bold'))
 
-	label1.grid(column = 0, row = 0)
+	infolabel.grid(column = 0, row = 0)
+
+	label1.grid(column = 0, row = 1)
 	label2.grid(column = 1, row = 0)
-	T.grid(column = 1, row = 1, rowspan = 20)
+	T.grid(column = 1, row = 1, rowspan = 100)
 
-	clientsButton.grid(column = 0, row = 1)
+	clientsButton.grid(column = 0, row = 2)
 
-	sendToVKbutton.grid(column = 0, row = 2)
-	sendToTGbutton.grid(column = 0, row = 3)
+	sendToVKbutton.grid(column = 0, row = 3)
+	sendToTGbutton.grid(column = 0, row = 4)
 
-	sendToVKclientsButton.grid(column = 0, row = 4)
-	sendToTGclientsButton.grid(column = 0, row = 5)
-	cmdButton.grid(column = 0, row = 6)
+	sendToVKclientsButton.grid(column = 0, row = 5)
+	sendToTGclientsButton.grid(column = 0, row = 6)
+	cmdButton.grid(column = 0, row = 7)
+	screenButton.grid(column = 0, row = 8)
+	sendToClientButton.grid(column = 0, row = 9)
+	clearButton.grid(column = 0, row = 10)
 
 	mainFrame.protocol("WM_DELETE_WINDOW", close_connection)
 
